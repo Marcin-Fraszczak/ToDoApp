@@ -1,25 +1,44 @@
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
-  entry: "./js/app.js",
+  mode: "none",
+  entry: `./js/app.js`,
+  devtool: "inline-source-map",
   output: {
     filename: "out.js",
-    path: path.resolve(__dirname, "build")
+    path: path.resolve(__dirname, "build"),
+    clean: true,
   },
   devServer: {
-    contentBase: path.join(__dirname),
-    publicPath: "/build/",
+    open: true,
+    hot: true,
+    static: [
+      {
+        directory: path.join(__dirname),
+        publicPath: "/",
+        serveIndex: true,
+      },
+    ],
+    devMiddleware: {
+      writeToDisk: true,
+    },
     compress: true,
     port: 3001,
-    historyApiFallback: true
+    historyApiFallback: true,
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader"
-      }
-    ]
-  }
+        loader: "babel-loader",
+      },
+    ],
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      process: "process/browser",
+    }),
+  ],
 };
