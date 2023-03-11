@@ -1,35 +1,30 @@
 import React, {useEffect, useState} from "react"
 import {postOperation} from "./fetches";
+import {errorMsg, errorStyle, validateString} from "./config";
 
 const Operations = (props) => {
-    const errorMsg = 'invalid name'
-    const errorStyle = {color: 'red', width: '7rem', marginLeft: '2rem'}
     const [value, setValue] = useState('')
     const [error, setError] = useState(false)
-
-    const validateString = value => value ? value : null
 
     useEffect(() => {
         if (!props.form) {
             setError(false)
             setValue('')
         }
-        if (value) {
-            setError(!validateString(value))
-        }
+        value && setError(!validateString(value, 5))
     }, [value, props.form])
 
     const handleSubmit = (e) => {
         e.preventDefault()
         let description = e.target.name.value
-        if (validateString(description)) {
-            e.target.name.value = ''
+        if (validateString(description, 5)) {
+            setValue('')
             setError(false)
             const data = {
                 description: description,
                 timeSpent: 0,
             }
-            postOperation(props.taskId, data, props.setOperations(prev => [...prev, data]))
+            postOperation(props.taskId, data, () => props.setTaskReload(!props.taskReload))
         } else {
             setError(true)
         }
@@ -46,17 +41,17 @@ const Operations = (props) => {
                                placeholder="Operation description"
                                value={value}
                                onChange={e => setValue(e.target.value)}/>
-
-
                         <div className="input-group-append">
                             <button className="btn btn-info">
                                 Add
                                 <i className="fas fa-plus-circle ml-1"></i>
                             </button>
-                            <div style={errorStyle}>{error ? errorMsg : ''}</div>
                         </div>
+                        <div className='input-group-append' style={errorStyle}>{error ? errorMsg : ''}</div>
                     </div>
+
                 </form>
+
             </div>
 
             <ul className="list-group list-group-flush">

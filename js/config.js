@@ -14,4 +14,8 @@ const getAPIKey = async (successCallback) => {
     }
 }
 
-export {API_KEY, API_URL, getAPIKey}
+const errorMsg = 'Input too short'
+const errorStyle = {color: 'red', display: 'inline', marginLeft: '2rem', width: '25%'}
+const validateString = (s, minLength) => s && s.length >= minLength
+
+export {API_KEY, API_URL, getAPIKey, errorMsg, errorStyle, validateString}

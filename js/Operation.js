@@ -1,30 +1,11 @@
 import React, {useEffect, useState} from "react"
-import {putOperation} from "./fetches";
+import {deleteOperation, putOperation} from "./fetches";
 
 const Operation = (props) => {
-    const errorMsg = 'incorrect time'
-    const errorStyle = {color: 'red'}
     const [form, setForm] = useState(false)
     const [error, setError] = useState(false)
     const [value, setValue] = useState('')
     const [operation, setOperation] = useState(props.operation)
-
-    const ModifyOperation = (time) => {
-        setOperation(prevOperation => {
-            return {
-                ...prevOperation,
-                timeSpent: prevOperation.timeSpent + time,
-            }
-        })
-    }
-
-    const displayTime = value => value >= 60 ? `${Math.floor(value / 60)}h ${value % 60}m` : `${value}m`
-
-    const hideTimeForm = (e) => {
-        e.preventDefault()
-        setForm(false)
-        setError(false)
-    }
 
     useEffect(() => {
         if (value) {
@@ -32,27 +13,52 @@ const Operation = (props) => {
         }
     }, [value])
 
+    useEffect(() => {
+        if (operation.id !== props.operation.id) {
+            setOperation(props.operation)
+        }
+    }, [props.operation])
+
+    const errorMsg = 'incorrect time'
+    const errorStyle = {color: 'red'}
+    const displayTime = value => value >= 60 ? `${Math.floor(value / 60)}h ${value % 60}m` : `${value}m`
     const validateNumber = value => value ? (value.match(/^[0-9]+$/) && Number(value) > 0) : null
+
+    const hideTimeForm = (e) => {
+        e.preventDefault()
+        setForm(false)
+        setError(false)
+        setValue('')
+    }
+
+    const ModifyOperation = (time) => {
+        setOperation(prevOperation => {
+            return {
+                ...prevOperation,
+                timeSpent: time,
+            }
+        })
+    }
 
     const addTime = (e) => {
         e.preventDefault()
         let time = e.target.time.value
         if (validateNumber(time)) {
-            e.target.time.value = ''
+            setValue('')
             setError(false)
             setForm(false)
             const data = {
                 description: operation.description,
                 timeSpent: operation.timeSpent + Number(time)
             }
-            putOperation(operation.id, data, ModifyOperation(Number(time)))
+            putOperation(operation.id, data, ModifyOperation)
         } else {
             setError(true)
         }
     }
 
-    const deleteOperation = (id) => {
-        console.log('id to delete ', id)
+    const removeOperation = (id) => {
+        deleteOperation(id, () => props.setTaskReload(!props.taskReload))
     }
 
     return (
@@ -72,6 +78,7 @@ const Operation = (props) => {
                            placeholder="Spent time in minutes"
                            style={{width: '12rem'}}
                            name='time'
+                           value={value}
                            onChange={e => setValue(e.target.value)}/>
                     <div className="input-group-append">
                         <button className="btn btn-outline-success"><i className="fas fa-save"></i></button>
@@ -88,7 +95,8 @@ const Operation = (props) => {
                     Add time<i className="fas fa-clock ml-1"></i>
                 </button>
                 <button className="btn btn-outline-danger btn-sm"
-                        onClick={() => deleteOperation(operation.id)}><i className="fas fa-trash"></i>
+                        onClick={() => removeOperation(operation.id)}><i
+                    className="fas fa-trash"></i>
                 </button>
             </div>
         </li>
