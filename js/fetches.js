@@ -7,9 +7,10 @@ const getTasks = async (successCallback) => {
                 Authorization: API_KEY,
             },
         })
-
+        if (!response.ok) {
+            throw new Error('Network error')
+        }
         const data = await response.json()
-
         if (data.error || typeof successCallback !== "function") {
             throw new Error("Error!")
         }
@@ -21,32 +22,38 @@ const getTasks = async (successCallback) => {
     }
 }
 
-const putTask = async (taskId, data, successCallback) => {
+const putTask = async (taskId, taskData, successCallback) => {
     try {
         const response = await fetch(`${API_URL}/tasks/${taskId}`, {
             method: 'PUT',
-            body: JSON.stringify(data),
+            body: JSON.stringify(taskData),
             headers: {
                 Authorization: API_KEY,
                 "Content-Type": "application/json",
             },
         })
-        successCallback(data.status)
+        if (!response.ok) {
+            throw new Error('Network error')
+        }
+        successCallback(taskData.status)
     } catch (err) {
         console.log(err)
     }
 }
 
-const postTask = async (data, successCallback) => {
+const postTask = async (taskData, successCallback) => {
     try {
         const response = await fetch(`${API_URL}/tasks`, {
             method: 'POST',
-            body: JSON.stringify(data),
+            body: JSON.stringify(taskData),
             headers: {
                 Authorization: API_KEY,
                 "Content-Type": "application/json",
             },
         })
+        if (!response.ok) {
+            throw new Error('Network error')
+        }
         successCallback()
     } catch (err) {
         console.log(err)
@@ -61,6 +68,9 @@ const deleteTask = async (taskId, successCallback) => {
                 Authorization: API_KEY,
             },
         })
+        if (!response.ok) {
+            throw new Error('Network error')
+        }
         successCallback()
     } catch (err) {
         console.log(err)
@@ -98,6 +108,9 @@ const putOperation = async (operationId, data, successCallback) => {
                 "Content-Type": "application/json",
             },
         })
+        if (!response.ok) {
+            throw new Error('Network error')
+        }
         successCallback(data.timeSpent)
     } catch (err) {
         console.log(err)
@@ -114,6 +127,9 @@ const postOperation = async (taskId, data, successCallback) => {
                 "Content-Type": "application/json",
             },
         })
+        if (!response.ok) {
+            throw new Error('Network error')
+        }
         successCallback()
     } catch (err) {
         console.log(err)
@@ -128,6 +144,9 @@ const deleteOperation = async (operationId, successCallback) => {
                 Authorization: API_KEY,
             },
         })
+        if (!response.ok) {
+            throw new Error('Network error')
+        }
         successCallback()
     } catch (err) {
         console.log(err)
