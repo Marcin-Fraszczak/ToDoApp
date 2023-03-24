@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react"
-import {deleteOperation, putOperation} from "./fetches";
+import {deleteOperation, putOperation} from "../API/fetches";
 
 const Operation = (props) => {
     const [form, setForm] = useState(false)

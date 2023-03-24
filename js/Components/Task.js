@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react"
-import {getOperations} from "./fetches"
+import {getOperations} from "../API/fetches"
 import {Operations} from "./Operations"
 import {Operation} from "./Operation"
-import {putTask} from "./fetches";
+import {putTask} from "../API/fetches";
 
 const Task = (props) => {
     const [task, setTask] = useState(props.task)

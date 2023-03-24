@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react"
-import {postTask} from "./fetches";
-import {errorStyle, errorMsg, validateString} from "./config";
+import {postTask} from "../API/fetches";
+import {errorStyle, errorMsg, validateString} from "../config";
 
 const NewTask = (props) => {
     const [title, setTitle] = useState('')

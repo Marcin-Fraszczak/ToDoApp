@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react"
-import {postOperation} from "./fetches";
-import {errorMsg, errorStyle, validateString} from "./config";
+import {postOperation} from "../API/fetches";
+import {errorMsg, errorStyle, validateString} from "../config";
 
 const Operations = (props) => {
     const [value, setValue] = useState('')

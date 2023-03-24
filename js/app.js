@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react"
 import {createRoot} from "react-dom/client"
-import {getTasks, deleteTask} from "./fetches"
-import {Task} from "./Task"
-import {NewTask} from "./NewTask";
+import {getTasks, deleteTask} from "./API/fetches"
+import {Task} from "./Components/Task"
+import {NewTask} from "./Components/NewTask";
 
 const App = () => {
     const [tasks, setTasks] = useState([])
