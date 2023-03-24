@@ -30,7 +30,7 @@ const NewTask = (props) => {
             }
             setTitle('')
             setDescription('')
-            postTask(data, () => props.setAppReload(!props.appReload))
+            postTask(data, props.setTasks)
             e.target.title.focus()
         } else {
             setFormError(true)

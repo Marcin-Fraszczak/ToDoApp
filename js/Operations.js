@@ -24,7 +24,7 @@ const Operations = (props) => {
                 description: description,
                 timeSpent: 0,
             }
-            postOperation(props.taskId, data, () => props.setTaskReload(!props.taskReload))
+            postOperation(props.taskId, data, props.setOperations)
         } else {
             setError(true)
         }
@@ -33,7 +33,7 @@ const Operations = (props) => {
     return (
         <>
             <div className="card-body">
-                <form hidden={!props.form} onSubmit={(e) => handleSubmit(e)}>
+                <form hidden={!props.form} onSubmit={handleSubmit}>
                     <div className="input-group">
                         <input type="text"
                                name='name'
@@ -49,9 +49,7 @@ const Operations = (props) => {
                         </div>
                         <div className='input-group-append' style={errorStyle}>{error ? errorMsg : ''}</div>
                     </div>
-
                 </form>
-
             </div>
 
             <ul className="list-group list-group-flush">

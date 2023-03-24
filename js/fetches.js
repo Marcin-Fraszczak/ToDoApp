@@ -1,12 +1,7 @@
 import {API_KEY, API_URL} from "./config"
 
-const getTasks = async (successCallback) => {
+const checkForErrors = async (response, successCallback) => {
     try {
-        const response = await fetch(`${API_URL}/tasks`, {
-            headers: {
-                Authorization: API_KEY,
-            },
-        })
         if (!response.ok) {
             throw new Error('Network error')
         }
@@ -14,144 +9,114 @@ const getTasks = async (successCallback) => {
         if (data.error || typeof successCallback !== "function") {
             throw new Error("Error!")
         }
-        successCallback(data.data.sort(function (a, b) {
-            return new Date(b.addedDate) - new Date(a.addedDate)
-        }))
+        return data.data
     } catch (err) {
         console.log(err)
+        return null
     }
+}
+
+const getTasks = async (successCallback) => {
+    const response = await fetch(`${API_URL}/tasks`, {
+        headers: {
+            Authorization: API_KEY,
+        },
+    })
+    const data = await checkForErrors(response, successCallback)
+    data && successCallback(data.sort(function (a, b) {
+        return new Date(b.addedDate) - new Date(a.addedDate)
+    }))
 }
 
 const putTask = async (taskId, taskData, successCallback) => {
-    try {
-        const response = await fetch(`${API_URL}/tasks/${taskId}`, {
-            method: 'PUT',
-            body: JSON.stringify(taskData),
-            headers: {
-                Authorization: API_KEY,
-                "Content-Type": "application/json",
-            },
-        })
-        if (!response.ok) {
-            throw new Error('Network error')
-        }
-        successCallback(taskData.status)
-    } catch (err) {
-        console.log(err)
-    }
+    const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        method: 'PUT',
+        body: JSON.stringify(taskData),
+        headers: {
+            Authorization: API_KEY,
+            "Content-Type": "application/json",
+        },
+    })
+    const data = await checkForErrors(response, successCallback)
+    data && successCallback(taskData.status)
 }
 
 const postTask = async (taskData, successCallback) => {
-    try {
-        const response = await fetch(`${API_URL}/tasks`, {
-            method: 'POST',
-            body: JSON.stringify(taskData),
-            headers: {
-                Authorization: API_KEY,
-                "Content-Type": "application/json",
-            },
-        })
-        if (!response.ok) {
-            throw new Error('Network error')
-        }
-        successCallback()
-    } catch (err) {
-        console.log(err)
-    }
+    const response = await fetch(`${API_URL}/tasks`, {
+        method: 'POST',
+        body: JSON.stringify(taskData),
+        headers: {
+            Authorization: API_KEY,
+            "Content-Type": "application/json",
+        },
+    })
+    const data = await checkForErrors(response, successCallback)
+    data && successCallback(prev => [data, ...prev])
 }
 
 const deleteTask = async (taskId, successCallback) => {
-    try {
-        const response = await fetch(`${API_URL}/tasks/${taskId}`, {
-            method: 'DELETE',
-            headers: {
-                Authorization: API_KEY,
-            },
-        })
-        if (!response.ok) {
-            throw new Error('Network error')
-        }
-        successCallback()
-    } catch (err) {
-        console.log(err)
-    }
+    const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: API_KEY,
+        },
+    })
+    const data = await checkForErrors(response, successCallback)
+    data && successCallback(prev => prev.filter(item => item.id !== taskId))
 }
 
 const getOperations = async (id, successCallback) => {
-    try {
-        const response = await fetch(`${API_URL}/tasks/${id}/operations`, {
-            headers: {
-                Authorization: API_KEY,
-            },
-        })
-
-        let data = await response.json()
-
-        if (data.error || typeof successCallback !== "function") {
-            throw new Error("Error!")
-        }
-        successCallback(data.data.sort(function (a, b) {
-            return new Date(a.addedDate) - new Date(b.addedDate)
-        }))
-    } catch (err) {
-        console.log(err)
-    }
+    const response = await fetch(`${API_URL}/tasks/${id}/operations`, {
+        headers: {
+            Authorization: API_KEY,
+        },
+    })
+    let data = await checkForErrors(response, successCallback)
+    data && successCallback(data.sort(function (a, b) {
+        return new Date(a.addedDate) - new Date(b.addedDate)
+    }))
 }
 
-const putOperation = async (operationId, data, successCallback) => {
-    try {
-        const response = await fetch(`${API_URL}/operations/${operationId}`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-            headers: {
-                Authorization: API_KEY,
-                "Content-Type": "application/json",
-            },
-        })
-        if (!response.ok) {
-            throw new Error('Network error')
+const putOperation = async (operationId, operationData, successCallback) => {
+    const response = await fetch(`${API_URL}/operations/${operationId}`, {
+        method: 'PUT',
+        body: JSON.stringify(operationData),
+        headers: {
+            Authorization: API_KEY,
+            "Content-Type": "application/json",
+        },
+    })
+    const data = await checkForErrors(response, successCallback)
+    data && successCallback(prev => {
+        return {
+            ...prev,
+            timeSpent: data.timeSpent,
         }
-        successCallback(data.timeSpent)
-    } catch (err) {
-        console.log(err)
-    }
+    })
 }
 
-const postOperation = async (taskId, data, successCallback) => {
-    try {
-        const response = await fetch(`${API_URL}/tasks/${taskId}/operations`, {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: {
-                Authorization: API_KEY,
-                "Content-Type": "application/json",
-            },
-        })
-        if (!response.ok) {
-            throw new Error('Network error')
-        }
-        successCallback()
-    } catch (err) {
-        console.log(err)
-    }
+const postOperation = async (taskId, operationData, successCallback) => {
+    const response = await fetch(`${API_URL}/tasks/${taskId}/operations`, {
+        method: 'POST',
+        body: JSON.stringify(operationData),
+        headers: {
+            Authorization: API_KEY,
+            "Content-Type": "application/json",
+        },
+    })
+    const data = await checkForErrors(response, successCallback)
+    data && successCallback(prev => [data, ...prev])
 }
 
 const deleteOperation = async (operationId, successCallback) => {
-    try {
-        const response = await fetch(`${API_URL}/operations/${operationId}`, {
-            method: 'DELETE',
-            headers: {
-                Authorization: API_KEY,
-            },
-        })
-        if (!response.ok) {
-            throw new Error('Network error')
-        }
-        successCallback()
-    } catch (err) {
-        console.log(err)
-    }
+    const response = await fetch(`${API_URL}/operations/${operationId}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: API_KEY,
+        },
+    })
+    const data = await checkForErrors(response, successCallback)
+    data && successCallback(prev => prev.filter(item => item.id !== operationId))
 }
 
 export {getTasks, putTask, postTask, deleteTask, getOperations, putOperation, postOperation, deleteOperation}
-

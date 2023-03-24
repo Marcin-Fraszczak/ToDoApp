@@ -6,21 +6,20 @@ import {NewTask} from "./NewTask";
 
 const App = () => {
     const [tasks, setTasks] = useState([])
-    const [appReload, setAppReload] = useState(false)
 
     useEffect(() => {
         getTasks(setTasks)
-    }, [appReload])
+    }, [])
 
     const onRemoveTask = (id) => {
-        deleteTask(id, () => setAppReload(!appReload))
+        deleteTask(id, setTasks)
     }
 
     return (
         <>
-            <NewTask appReload={appReload} setAppReload={setAppReload}/>
-            {tasks.map((item, index) =>
-                <Task key={index} task={item} onRemoveTask={onRemoveTask}/>)}
+            <NewTask setTasks={setTasks}/>
+            {tasks.map(item =>
+                <Task key={item.id} task={item} onRemoveTask={onRemoveTask}/>)}
         </>
     )
 }

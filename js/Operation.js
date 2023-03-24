@@ -13,16 +13,10 @@ const Operation = (props) => {
         }
     }, [value])
 
-    useEffect(() => {
-        if (operation.id !== props.operation.id) {
-            setOperation(props.operation)
-        }
-    }, [props.operation])
-
     const errorMsg = 'incorrect time'
     const errorStyle = {color: 'red'}
     const displayTime = value => value >= 60 ? `${Math.floor(value / 60)}h ${value % 60}m` : `${value}m`
-    const validateNumber = value => value ? (value.match(/^[0-9]+$/) && Number(value) > 0) : null
+    const validateNumber = value => value.match(/^-?[0-9]+$/) ? value.match(/^-?[0-9]+$/)[0] : false
 
     const hideTimeForm = (e) => {
         e.preventDefault()
@@ -31,34 +25,23 @@ const Operation = (props) => {
         setValue('')
     }
 
-    const ModifyOperation = (time) => {
-        setOperation(prevOperation => {
-            return {
-                ...prevOperation,
-                timeSpent: time,
-            }
-        })
-    }
-
     const addTime = (e) => {
         e.preventDefault()
         let time = e.target.time.value
-        if (validateNumber(time)) {
+        try {
+            time = validateNumber(time) && parseInt(time)
             setValue('')
             setError(false)
             setForm(false)
             const data = {
                 description: operation.description,
-                timeSpent: operation.timeSpent + Number(time)
+                timeSpent: Math.max(operation.timeSpent + Number(time), 0)
             }
-            putOperation(operation.id, data, ModifyOperation)
-        } else {
+            putOperation(operation.id, data, setOperation)
+        } catch (err) {
             setError(true)
+            console.log(err)
         }
-    }
-
-    const removeOperation = (id) => {
-        deleteOperation(id, () => props.setTaskReload(!props.taskReload))
     }
 
     return (
@@ -71,7 +54,7 @@ const Operation = (props) => {
             </div>
 
             <div style={errorStyle}>{error ? errorMsg : ''}</div>
-            <form hidden={!form} onSubmit={e => addTime(e)}>
+            <form hidden={!form} onSubmit={addTime}>
                 <div className="input-group input-group-sm">
                     <input type="number"
                            className="form-control"
@@ -83,7 +66,7 @@ const Operation = (props) => {
                     <div className="input-group-append">
                         <button className="btn btn-outline-success"><i className="fas fa-save"></i></button>
                         <button className="btn btn-outline-dark"
-                                onClick={e => hideTimeForm(e)}
+                                onClick={hideTimeForm}
                         ><i className="fas fa-times false"></i></button>
                     </div>
                 </div>
@@ -95,7 +78,7 @@ const Operation = (props) => {
                     Add time<i className="fas fa-clock ml-1"></i>
                 </button>
                 <button className="btn btn-outline-danger btn-sm"
-                        onClick={() => removeOperation(operation.id)}><i
+                        onClick={() => deleteOperation(operation.id, props.setOperations)}><i
                     className="fas fa-trash"></i>
                 </button>
             </div>
